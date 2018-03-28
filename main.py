@@ -30,16 +30,11 @@ class NGramLanguageModeler(nn.Module):
         return log_probs
 
 
-def main(document, embedding_dim, context_size):
-
+def main(document, embedding_dim, context_size, epochs):
     print("Running NGram Language Modeler")
-
-
     bar = progressbar.ProgressBar(redirect_stdout=True)  # for progress bar out
-
     trigrams = [([document[i], document[i+1]], document[i+2]) \
                     for i in range(len(document) - 2)]
-
     vocab = set(document)
     word_to_ix = {word: i for i, word in enumerate(vocab)}
 
@@ -47,31 +42,20 @@ def main(document, embedding_dim, context_size):
     loss_function = nn.NLLLoss()
     model = NGramLanguageModeler(len(vocab), embedding_dim, context_size)
     optimizer = optim.SGD(model.parameters(), lr=1e-3)
-
-    for epoch in range(100):
+    for epoch in range(epochs):
         total_loss = torch.Tensor([0])
         for context, target in trigrams:
             context_idxs = [word_to_ix[w] for w in context]
             context_var = autograd.Variable(torch.LongTensor(context_idxs))
-
             model.zero_grad()
-
             log_probs = model(context_var)
-
             loss = loss_function(log_probs, autograd.Variable(torch.LongTensor([word_to_ix[target]])))
-
             loss.backward()
             optimizer.step()
-
             total_loss += loss.data
 
-
-
         losses.append(total_loss)
-
         bar.update(epoch)
-    # print("Losses", losses)
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -108,4 +92,4 @@ if __name__ == "__main__":
     with open(doc, 'r') as f:
         document = f.read().split()
 
-    main(document, EMBEDDING_DIM, CONTEXT_SIZE)
+    main(document, dims, context, eps)

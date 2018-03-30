@@ -1,6 +1,6 @@
 import argparse
 
-import progressbar
+from tqdm import trange
 import torch
 import torch.autograd as autograd
 import torch.nn as nn
@@ -32,30 +32,36 @@ class NGramLanguageModeler(nn.Module):
 
 def main(document, embedding_dim, context_size, epochs):
     print("Running NGram Language Modeler")
-    bar = progressbar.ProgressBar(redirect_stdout=True)  # for progress bar out
+    losses = []
+
     trigrams = [([document[i], document[i+1]], document[i+2]) \
                     for i in range(len(document) - 2)]
     vocab = set(document)
     word_to_ix = {word: i for i, word in enumerate(vocab)}
 
-    losses = []
-    loss_function = nn.NLLLoss()
     model = NGramLanguageModeler(len(vocab), embedding_dim, context_size)
+    loss_function = nn.NLLLoss()
     optimizer = optim.SGD(model.parameters(), lr=1e-3)
-    for epoch in range(epochs):
+    pbar = trange(epochs, unit='epoch')  # progress bar
+
+    for epoch in pbar:
+        pbar.set_description('Epoch %3d' % (epoch))  # change progress label
+
         total_loss = torch.Tensor([0])
         for context, target in trigrams:
             context_idxs = [word_to_ix[w] for w in context]
             context_var = autograd.Variable(torch.LongTensor(context_idxs))
             model.zero_grad()
             log_probs = model(context_var)
-            loss = loss_function(log_probs, autograd.Variable(torch.LongTensor([word_to_ix[target]])))
-            loss.backward()
-            optimizer.step()
+            loss = loss_function(
+                log_probs,  # outputs from the model
+                autograd.Variable(torch.LongTensor([word_to_ix[target]]))
+            )
+            loss.backward()  # back propagation
+            optimizer.step()  # update parameters
             total_loss += loss.data
 
         losses.append(total_loss)
-        bar.update(epoch)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -81,7 +87,7 @@ if __name__ == "__main__":
         "-epochs",
         type=int,
         required=False,
-        default=100,
+        default=1,
     )
     args = parser.parse_args()
     doc = args.document

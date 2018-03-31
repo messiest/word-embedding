@@ -59,7 +59,7 @@ def main(document, embedding_dim, context_size, epochs):
             )
             loss.backward()  # back propagation
             optimizer.step()  # update parameters
-            total_loss += loss.data
+            total_loss += loss.data[0]
 
         losses.append(total_loss)
 

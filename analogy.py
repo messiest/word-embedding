@@ -1,17 +1,17 @@
 import argparse
 
-from utils import get_word, closest, print_tuples
+from utils import get_word_vec, closest, print_tuples
 
 
 def analogy(w1, w2, w3, n=5, filter_given=True):
     print('%s : %s :: %s : ???' % (w1, w2, w3))
 
     # w2 - w1 + w3 = w4
-    closest_words = closest(get_word(w2) - get_word(w1) + get_word(w3))
+    closest = closest(get_word_vec(w2) - get_word_vec(w1) + get_word_vec(w3))
 
     # optionally filter out given words
     if filter_given:
-        closest_words = [t for t in closest_words if t[0] not in [w1, w2, w3]]
+        closest_words = [t for t in closest if t[0] not in [w1, w2, w3]]
 
     print_tuples(closest_words[:n])
 

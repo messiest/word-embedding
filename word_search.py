@@ -2,7 +2,8 @@ import argparse
 from utils import search_word
 
 
-def main():
+def main(word, n):
+    search = search_word(word, n)
     pass
 
 
@@ -25,6 +26,6 @@ if __name__ == "__main__":
     word = args.word
     n = args.n
 
-    search = search_word(word, n)
+    main(word, n)
 
     print(search)

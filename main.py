@@ -1,11 +1,26 @@
 import argparse
-from utils import search_word
 
 from torchtext import vocab
 
+from utils import search_word, get_word_vec, closest, cosine_similarity
+
+
+closest_word = closest
+
+tools = {
+    '1': search_word,
+    '2': get_word_vec,
+    '3': closest_word,
+    '4': cosine_similarity,
+}
+
 
 def main():
-    pass
+    for k in tools:
+        print(k, tools[k].__name__)
+    _input = input('Choose tool: ')
+    tool = tools[_input]
+    print("TOOL:", tool)
 
 
 if __name__ == "__main__":
@@ -33,6 +48,7 @@ if __name__ == "__main__":
     n = args.n
     corpus = args.corpus
 
-    search = search_word(word)
+    main()
 
-    print(search)
+    # search = search_word(word)
+    # print(search)

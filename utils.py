@@ -1,5 +1,6 @@
 import argparse
 
+import numpy as np
 import torch
 from torchtext import vocab
 
@@ -8,11 +9,18 @@ from torchtext import vocab
 CORPUS = '6B'
 glove = vocab.GloVe(name=CORPUS, dim=100)
 
-def get_word(word):
+
+def get_word_index(word):
     """
     retrieve the word vector
     """
+    return glove.stoi[word]  # string to int
 
+
+def get_word_vec(word):
+    """
+    retrieve the word vector
+    """
     return glove.vectors[glove.stoi[word]]  # string to int
 
 
@@ -43,9 +51,13 @@ def search_word(word, n=1, print_=False):
     return nearby
 
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Select training corpus")
+def cosine_similarity(u, v):  # TODO keep this in torch
+    distance = 0.0
+    u, v = u.numpy(), v.numpy()
 
-    args = parser.parse_args()
+    dot = np.matmul(u, v)
+    norm_u = np.sqrt(np.sum(u**2))
+    norm_v = np.sqrt(np.sum(v**2))
+    cosine_similarity = dot / (norm_u * norm_v)
 
-    CORPUS = args.corpus
+    return cosine_similarity

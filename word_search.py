@@ -1,8 +1,6 @@
 import argparse
 from utils import search_word
 
-from torchtext import vocab
-
 
 def main():
     pass
@@ -17,13 +15,8 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "-n",
+        type=int,
         default=5,
-        required=False,
-    )
-    parser.add_argument(
-        "-corpus",
-        type=str,
-        default='twitter.27B',
         required=False,
     )
     args = parser.parse_args()
@@ -31,8 +24,7 @@ if __name__ == "__main__":
     # unpack args
     word = args.word
     n = args.n
-    corpus = args.corpus
 
-    search = search_word(word)
+    search = search_word(word, n)
 
     print(search)

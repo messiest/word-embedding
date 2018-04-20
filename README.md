@@ -19,7 +19,7 @@ python3 word_search.py <word>
 
 Finds word that best completes the analogy in the form of:
 
-	word 1 : word 2 :: word 3 : ???
+- _word 1 : word 2 :: word 3 : ???_
 
 
 Command line usage:

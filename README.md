@@ -30,6 +30,12 @@ Command line usage:
 python3 analogy.py <word 1> <word 2> <word 3>
 ```
 
+
+#### `learn_embedding.py`
+
+Learn embedded word vectors from the provided text. 
+
+
 #### `graph.py`
 
 Generates a word graph of similar word graphs, by cosine similarity, of the provided word.

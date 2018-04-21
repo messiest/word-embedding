@@ -1,11 +1,13 @@
+import os
 import argparse
 
-from tqdm import trange
+from tqdm import tqdm, trange
 import torch
 import torch.autograd as autograd
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
+from torch.autograd import Variable
 
 
 # torch.manual_seed(1)  # for reproducibility
@@ -20,10 +22,11 @@ class NGramLanguageModeler(nn.Module):
         self.embeddings = nn.Embedding(vocab_size, embedding_dim)
         self.linear1 = nn.Linear(context_size * embedding_dim, 128)
         self.linear2 = nn.Linear(128, vocab_size)
+        self.dropout = nn.Dropout(0.25)
 
     def forward(self, inputs):
         embeds = self.embeddings(inputs).view((1, -1))
-        out = F.relu(self.linear1(embeds))
+        out = F.relu(self.dropout(self.linear1(embeds)))
         out = self.linear2(out)
         log_probs = F.log_softmax(out, dim=1)
 
@@ -40,17 +43,21 @@ def main(document, embedding_dim, context_size, epochs):
     word_to_ix = {word: i for i, word in enumerate(vocab)}
 
     model = NGramLanguageModeler(len(vocab), embedding_dim, context_size)
+    print(model)
+
     loss_function = nn.NLLLoss()
     optimizer = optim.SGD(model.parameters(), lr=1e-3)
-    pbar = trange(epochs, unit='epoch')  # progress bar
-
-    for epoch in pbar:
-        pbar.set_description('Epoch %3d' % (epoch))  # change progress label
+    # pbar_e = trange(epochs, unit='epoch', desc='Epoch ???')  # progress bar
+    # for epoch in pbar_e:
+    for epoch in range(epochs):
 
         total_loss = torch.Tensor([0])
-        for context, target in trigrams:
+        pbar = tqdm(trigrams, unit=' trigram', desc='Epoch ???')  # progress bar
+        # for context, target in trigrams:
+        for context, target in pbar:
             context_idxs = [word_to_ix[w] for w in context]
             context_var = autograd.Variable(torch.LongTensor(context_idxs))
+
             model.zero_grad()
             log_probs = model(context_var)
             loss = loss_function(
@@ -60,6 +67,9 @@ def main(document, embedding_dim, context_size, epochs):
             loss.backward()  # back propagation
             optimizer.step()  # update parameters
             total_loss += loss.data
+
+            # change progressbar label
+            pbar.set_description('Epoch %d/%d' % (epoch+1, epochs))
 
         losses.append(total_loss)
 
@@ -95,7 +105,7 @@ if __name__ == "__main__":
     context = args.context
     eps = args.epochs
 
-    with open(doc, 'r') as f:
+    with open(os.path.join('texts', doc), 'r') as f:
         document = f.read().split()
 
     main(document, dims, context, eps)

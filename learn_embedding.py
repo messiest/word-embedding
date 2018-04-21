@@ -33,24 +33,31 @@ class NGramLanguageModeler(nn.Module):
         return log_probs
 
 
-def main(document, embedding_dim, context_size, epochs):
+def main(doc, n, embedding_dim, context_size, epochs):
     print("Running NGram Language Modeler")
+    with open(os.path.join('texts', doc), 'r') as f:
+        document = f.read().split()
     losses = []
+
+    # ngrams = []
+    # n = 3
+    # for i in range(len(document) - (n-1)):
+    #     gram = tuple(document[i+j] for j in range(n))
+    #     print(gram)
+    #     ngrams.append(gram)
 
     trigrams = [([document[i], document[i+1]], document[i+2]) \
                     for i in range(len(document) - 2)]
+
     vocab = set(document)
     word_to_ix = {word: i for i, word in enumerate(vocab)}
 
     model = NGramLanguageModeler(len(vocab), embedding_dim, context_size)
-    print(model)
 
     loss_function = nn.NLLLoss()
     optimizer = optim.SGD(model.parameters(), lr=1e-3)
-    # pbar_e = trange(epochs, unit='epoch', desc='Epoch ???')  # progress bar
-    # for epoch in pbar_e:
-    for epoch in range(epochs):
 
+    for epoch in range(epochs):
         total_loss = torch.Tensor([0])
         pbar = tqdm(trigrams, unit=' trigram', desc='Epoch ???')  # progress bar
         # for context, target in trigrams:
@@ -69,7 +76,7 @@ def main(document, embedding_dim, context_size, epochs):
             total_loss += loss.data
 
             # change progressbar label
-            pbar.set_description('Epoch %d/%d' % (epoch+1, epochs))
+            pbar.set_description('Epoch %d/%d - Loss %d' % (epoch+1, epochs, loss))
 
         losses.append(total_loss)
 
@@ -79,7 +86,13 @@ if __name__ == "__main__":
         '-document',
         type=str,
         required=False,
-        default="iliad.txt",
+        default="heart_of_darkness.txt",
+    )
+    parser.add_argument(
+        '-n',
+        type=int,
+        required=False,
+        default=3,
     )
     parser.add_argument(
         '-dims',
@@ -101,11 +114,10 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
     doc = args.document
+    n = args.n
     dims = args.dims
     context = args.context
     eps = args.epochs
 
-    with open(os.path.join('texts', doc), 'r') as f:
-        document = f.read().split()
-
-    main(document, dims, context, eps)
+    # TODO figure out how to generalize to ngrams
+    main(doc, n, dims, context, eps)

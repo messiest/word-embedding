@@ -33,7 +33,11 @@ python3 analogy.py <word 1> <word 2> <word 3>
 
 #### `learn_embedding.py`
 
-Learn embedded word vectors from the provided text. 
+Learn embedded word vectors from the provided text.
+
+```
+python3 learn_embedding.py <text> 
+```
 
 
 #### `graph.py`

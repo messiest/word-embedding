@@ -29,7 +29,7 @@ def closest(vec, n=10):
     find the closest words for a given vector
     returns tuples of word and cosine similarity
     """
-    all_dists = [(w, torch.dist(vec, get_word(w))) for w in glove.itos]
+    all_dists = [(w, torch.dist(vec, get_word_vec(w))) for w in glove.itos]
 
     return sorted(all_dists, key=lambda t: t[1])[1:n]
 

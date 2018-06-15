@@ -36,15 +36,5 @@ python3 analogy.py <word 1> <word 2> <word 3>
 Learn embedded word vectors from the provided text.
 
 ```
-python3 learn_embedding.py <text> 
-```
-
-
-#### `graph.py`
-
-Generates a word graph of similar word graphs, by cosine similarity, of the provided word.
-
-Command line useage:
-```
-python3 graph.py <word>
+python3 learn_embedding.py <text>
 ```

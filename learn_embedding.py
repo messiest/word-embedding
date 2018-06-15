@@ -39,15 +39,9 @@ def main(doc, n, embedding_dim, context_size, epochs):
         document = f.read().split()
     losses = []
 
-    # ngrams = []
-    # n = 3
-    # for i in range(len(document) - (n-1)):
-    #     gram = tuple(document[i+j] for j in range(n))
-    #     print(gram)
-    #     ngrams.append(gram)
+    ngrams = [([document[i+j] for j in range(n-1)], document[i+(n-1)]) \
+        for i in range(len(document) - (n-1))]
 
-    trigrams = [([document[i], document[i+1]], document[i+2]) \
-                    for i in range(len(document) - 2)]
 
     vocab = set(document)
     word_to_ix = {word: i for i, word in enumerate(vocab)}
@@ -59,9 +53,9 @@ def main(doc, n, embedding_dim, context_size, epochs):
 
     for epoch in range(epochs):
         total_loss = torch.Tensor([0])
-        pbar = tqdm(trigrams, unit=' trigram', desc='Epoch ???')  # progress bar
+        pbar = tqdm(ngrams, unit='{}-gram'.format(n), desc='Epoch ???')  # progress bar
         # for context, target in trigrams:
-        for context, target in pbar:
+        for i, (context, target) in enumerate(pbar):
             context_idxs = [word_to_ix[w] for w in context]
             context_var = autograd.Variable(torch.LongTensor(context_idxs))
 
@@ -76,7 +70,10 @@ def main(doc, n, embedding_dim, context_size, epochs):
             total_loss += loss.data
 
             # change progressbar label
-            pbar.set_description('Epoch %d/%d - Loss %d' % (epoch+1, epochs, loss))
+            if i%50 == 0:
+                pbar.set_description(
+                    'Epoch %d/%d - Loss %d' % (epoch+1, epochs, loss)
+                )
 
         losses.append(total_loss)
 

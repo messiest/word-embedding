@@ -7,6 +7,9 @@ Texts from Project Gutenberg, [here](https://www.gutenberg.org/files/219/219-h/2
 
 	Note: This package uses pre-trained word vectors, downloading them automatically if they aren't found. The size of this file is 1.2GB. They will be installed in the directory .vector_caches/
 
+
+For additional texts, I recommend checking out [another repo of mine](https://github.com/messiest/wikitext-download) that will help you download a corpus of Wikipedia articles.
+
 ## Files
 
 #### `word_search.py`
